@@ -10,7 +10,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const user: TwitterAuthUser = JSON.parse(
       Buffer.from(session, 'base64').toString()
     );
-    const tweets = await getTweets(100, user);
+    const tweets = await getTweets(200, user);
     const userToxicity = await getToxicity(tweets);
     const usersToUnfollow = userToxicity
       .filter((t) => t.toxic)
