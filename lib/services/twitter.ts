@@ -20,7 +20,9 @@ interface TimelineData {
 const tw = new LoginWithTwitter({
   consumerKey: process.env.TD_CONSUMER_KEY,
   consumerSecret: process.env.TD_CONSUMER_SECRET,
-  callbackUrl: 'http://localhost:3000/api/callback',
+  callbackUrl: process.env.DEV_MODE
+    ? 'http://localhost:3000/api/callback'
+    : 'https://twitter-detox.herokuapp.com/',
 });
 
 export const login = () =>
