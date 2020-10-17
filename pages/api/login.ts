@@ -1,8 +1,24 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import { NextApiRequest, NextApiResponse } from 'next';
+import { LoginSession } from '../../lib/db/LoginSession';
+import { login } from '../../lib/services/twitter';
+import { v4 as uuidv4 } from 'uuid';
+import Cookies from 'cookies';
+import { initDB, disconnectDB } from '../../lib/db';
 
-import { NextApiRequest, NextApiResponse } from "next";
-
-export default (req: NextApiRequest, res: NextApiResponse) => {
-  res.statusCode = 200;
-  res.json({ name: "John Doe" });
+export default async (req: NextApiRequest, res: NextApiResponse) => {
+  try {
+    await initDB();
+    const cookies = new Cookies(req, res);
+    const { tokenSecret, url } = await login();
+    const session = uuidv4();
+    const loginSession = new LoginSession({ session, tokenSecret });
+    await loginSession.save();
+    cookies.set('TwitterDetoxLoginSession', session);
+    await disconnectDB();
+    res.redirect(url);
+  } catch (error) {
+    console.error(error);
+    res.statusCode = 500;
+    res.json({ error: error.message });
+  }
 };
